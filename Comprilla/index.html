@@ -1,65 +1,123 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>Lista compartida</title>
 <style>
-:root{--bg:#f6f5f1;--c:#fff;--t:#1d1d1b;--m:#7a7a72;--a:#1f9d55;--b:#e3e1d8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161615;--c:#222220;--t:#f1f0ea;--m:#9a9a90;--b:#33332f}}
-:root[data-theme="dark"]{--bg:#161615;--c:#222220;--t:#f1f0ea;--m:#9a9a90;--b:#33332f}
+:root{--bg:#f4f4f1;--c:#fff;--t:#161614;--m:#77776f;--a:#0f8a4f;--b:#e6e5de;--sh:0 1px 2px rgba(0,0,0,.05),0 4px 14px rgba(0,0,0,.06);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121211;--c:#1d1d1b;--t:#f1f0ea;--m:#96968d;--a:#2fbf78;--b:#2c2c29;--sh:none}}
+:root[data-theme="dark"]{--bg:#121211;--c:#1d1d1b;--t:#f1f0ea;--m:#96968d;--a:#2fbf78;--b:#2c2c29;--sh:none}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--t);font:16px system-ui,-apple-system,"Segoe UI",sans-serif}
-.w{max-width:560px;margin:0 auto;padding:14px 12px 0}
-input,button,select{font:inherit;color:inherit}
-input{background:var(--c);border:1px solid var(--b);border-radius:10px;padding:10px;min-width:0}
-button{cursor:pointer;border:1px solid var(--b);background:var(--c);border-radius:10px;padding:10px 12px}
-.top{display:flex;gap:8px;align-items:center}
-#tit{flex:1;font-size:20px;font-weight:600;background:transparent;border:0;padding:6px 2px}
-#sel{max-width:110px;background:var(--c);border:1px solid var(--b);border-radius:10px;padding:8px}
-.sub{color:var(--m);font-size:13px;margin:0 0 12px 2px}
-.add{display:flex;gap:6px;margin-bottom:12px}
-#txt{flex:1}
-#add{background:var(--a);color:#fff;border-color:var(--a);font-weight:700}
-#list{display:flex;flex-direction:column;gap:6px;min-height:120px}
-.r{display:flex;align-items:center;gap:6px;background:var(--c);border:1px solid var(--b);border-radius:12px;padding:6px}
+html,body{height:100%;margin:0}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--t);font:16px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.app{height:100%;display:flex;flex-direction:column;max-width:560px;margin:0 auto}
+header{padding:12px 14px 8px}
+.h1{display:flex;align-items:center;gap:6px}
+#tit{flex:1;min-width:0;font-size:22px;font-weight:700;background:transparent;border:0;padding:4px 2px;outline:0}
+.ib{position:relative;width:42px;height:42px;display:grid;place-items:center;border:1px solid var(--b);background:var(--c);border-radius:12px;padding:0}
+.ib select{position:absolute;inset:0;width:100%;opacity:0}
+#sub{margin:0 2px 10px;color:var(--m);font-size:13px}
+.acts{display:flex;gap:8px}
+.big{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 8px;border-radius:14px;border:1px solid var(--b);background:var(--c);font-weight:600;box-shadow:var(--sh)}
+.big.pr,.btn.pr{background:var(--a);border-color:var(--a);color:#fff}
+#list{flex:1;overflow-y:auto;padding:4px 14px 12px;display:flex;flex-direction:column;gap:8px}
+.r{background:var(--c);border:1px solid var(--b);border-radius:16px;padding:10px 8px 10px 12px;box-shadow:var(--sh)}
+.l1{display:flex;align-items:center;gap:6px}
+.ck{width:26px;height:26px;border-radius:50%;border:2px solid var(--b);background:transparent;padding:0;display:grid;place-items:center;color:#fff;flex:none;margin-right:2px}
+.ck .i{width:15px;height:15px;stroke-width:3;opacity:0}
+.ck.on{background:var(--a);border-color:var(--a)}.ck.on .i{opacity:1}
+.n{flex:1;min-width:0;border:0;background:transparent;font-size:16px;padding:6px 2px;outline:0}
 .r.d .n{text-decoration:line-through;color:var(--m)}
-.r input[type=checkbox]{width:22px;height:22px;accent-color:var(--a);flex:none}
-.k{cursor:pointer;font-size:18px;flex:none;user-select:none}
-.n{flex:1;border:0;background:transparent;padding:6px}
-.q{width:52px;text-align:center}.p{width:66px;text-align:right}
-.q,.p{padding:6px}
-.x{border:0;background:transparent;color:var(--m);padding:6px}
-.e{color:var(--m);text-align:center;padding:30px 10px}
-.bar{position:sticky;bottom:0;background:var(--bg);padding:10px 0 12px;display:flex;gap:8px;align-items:center;border-top:1px solid var(--b);margin-top:12px}
-#tot{flex:1;font-weight:600}
-#wa{background:var(--a);color:#fff;text-decoration:none;font-weight:700;border-radius:10px;padding:11px 16px}
-.ov{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:9}
-.ov>div{background:#fff;padding:14px;border-radius:14px;width:min(94vw,520px);max-height:94vh;overflow:auto;text-align:center;color:#111}
-.ov img{width:100%;height:auto;display:block;image-rendering:pixelated}
-.ov label{flex:1;border:1px solid #ddd;background:#f0efe9;border-radius:10px;padding:10px 12px;cursor:pointer}
-#ts{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#111;color:#fff;padding:10px 14px;border-radius:10px;display:none;z-index:20;max-width:90vw;text-align:center}
-.ov button{color:#111;background:#f0efe9;border-color:#ddd}
-.ov .qa{display:flex;gap:8px;margin-top:10px}.ov .qa button{flex:1}
-.ov .g{background:#1f9d55;color:#fff;border-color:#1f9d55;font-weight:700}
-.ov p{margin:8px 0 0;font-size:14px;min-height:18px}
-#vd{width:100%;max-height:42vh;object-fit:cover;border-radius:10px;background:#000;margin-top:8px}
-</style></head><body><div class="w">
-<div class="top"><input id="tit" placeholder="Título"><select id="sel"></select><button id="new" title="Nueva lista">＋</button></div>
-<p class="sub">Todo se guarda solo. Comparte y la otra persona abre el mismo enlace.</p>
-<div class="add"><button id="kd" title="Producto / Tarea">🛒</button><input id="txt" placeholder="Escribe y Enter (puedes separar con comas)" enterkeyhint="done" autocomplete="off"><button id="add">+</button></div>
+.tb{border:0;background:transparent;color:var(--m);padding:7px;border-radius:10px;display:grid;place-items:center}
+.l2{display:flex;gap:10px;align-items:center;margin:4px 6px 0 36px;flex-wrap:wrap}
+.f{display:flex;align-items:center;gap:6px;color:var(--m);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+.f input{width:66px;text-align:center;font-size:16px;padding:7px 4px;border:1px solid var(--b);border-radius:10px;background:var(--bg);text-transform:none}
+.st{margin-left:auto;font-weight:700;font-size:14px}
+.e{margin:auto;text-align:center;color:var(--m);padding:20px;display:flex;flex-direction:column;gap:6px;align-items:center}
+.e .i{width:46px;height:46px;stroke-width:1.3}
+.cp{padding:8px 14px 12px;background:var(--bg);border-top:1px solid var(--b)}
+.seg{display:inline-flex;background:var(--c);border:1px solid var(--b);border-radius:12px;padding:3px;margin-bottom:8px}
+.seg button{border:0;background:transparent;padding:7px 12px;border-radius:9px;color:var(--m);font-weight:600;font-size:14px;display:flex;gap:6px;align-items:center}
+.seg button.on{background:var(--a);color:#fff}
+.in{display:flex;gap:8px}
+#txt{flex:1;min-width:0;height:52px;padding:0 16px;border-radius:16px;border:1px solid var(--b);background:var(--c);font-size:16px}
+#add{width:52px;height:52px;border-radius:16px;border:0;background:var(--a);color:#fff;display:grid;place-items:center;box-shadow:var(--sh)}
+#add .i{width:26px;height:26px;stroke-width:2.4}
+.sh{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;z-index:9}
+.sh>div{width:min(100%,560px);background:var(--c);border-radius:22px 22px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));max-height:94%;overflow:auto}
+.sht{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.sht h2{margin:0;font-size:18px}
+.btn{width:100%;display:flex;gap:8px;align-items:center;justify-content:center;padding:14px;border-radius:14px;border:1px solid var(--b);background:var(--bg);font-weight:600;margin-top:8px}
+#qs{background:#fff;border-radius:14px;padding:6px;min-height:120px}
+#qs img{width:100%;max-width:340px;display:block;margin:auto;image-rendering:pixelated}
+.hint{color:var(--m);font-size:13px;text-align:center;margin:8px 0 0;min-height:18px}
+.vw{position:relative;border-radius:16px;overflow:hidden;background:#000;height:230px;display:grid;place-items:center;color:#aaa}
+#vd{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.vw:after{content:"";position:absolute;inset:16% 22%;border:2px solid rgba(255,255,255,.85);border-radius:16px;pointer-events:none}
+#off{display:none}
+.vw.off{height:64px}.vw.off #vd,.vw.off:after{display:none}.vw.off #off{display:block}
+#ts{position:fixed;left:50%;bottom:120px;transform:translateX(-50%);background:#111;color:#fff;padding:11px 16px;border-radius:12px;display:none;z-index:20;max-width:90vw;text-align:center;font-weight:600}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="i-qr" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h3M20 17v4"/></symbol>
+<symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M4 12h16"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/></symbol>
+<symbol id="i-bag" viewBox="0 0 24 24"><path d="M6 7h12l1 13H5zM9 7a3 3 0 0 1 6 0"/></symbol>
+<symbol id="i-task" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+<symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.7 7L4 20l1.1-4.9A8 8 0 1 1 21 12z"/></symbol>
+<symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></symbol>
+<symbol id="i-cam" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+<symbol id="i-camoff" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/><path d="M3 3l18 18"/></symbol>
+<symbol id="i-img" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+<symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+</svg>
+<div class="app">
+<header>
+<div class="h1"><input id="tit" placeholder="Nombre de la lista" aria-label="Nombre de la lista">
+<label class="ib" title="Mis listas"><svg class="i"><use href="#i-list"/></svg><select id="sel" aria-label="Mis listas"></select></label>
+<button class="ib" id="new" title="Nueva lista" aria-label="Nueva lista"><svg class="i"><use href="#i-plus"/></svg></button></div>
+<p id="sub"></p>
+<div class="acts"><button class="big" id="ld"><svg class="i"><use href="#i-scan"/></svg>Cargar QR</button><button class="big pr" id="qb"><svg class="i"><use href="#i-qr"/></svg>Compartir QR</button></div>
+</header>
 <div id="list"></div>
-<div class="bar"><div id="tot"></div><button id="qb">QR</button><button id="ld">Leer QR</button><a id="wa" target="_blank" rel="noopener">WhatsApp</a></div>
+<div class="cp">
+<div class="seg"><button id="kp" class="on"><svg class="i"><use href="#i-bag"/></svg>Producto</button><button id="kt"><svg class="i"><use href="#i-task"/></svg>Tarea</button></div>
+<div class="in"><input id="txt" placeholder="Agregar… (varios con comas)" enterkeyhint="done" autocomplete="off"><button id="add" aria-label="Agregar a la lista"><svg class="i"><use href="#i-plus"/></svg></button></div>
 </div>
-<div id="qr" class="ov"><div><div id="qs"></div><div class="qa"><button id="qd">⬇ Descargar</button><button id="qw" class="g">QR a WhatsApp</button></div><div class="qa"><button id="qc">Cerrar</button></div></div></div>
-<div id="sc" class="ov"><div><div class="qa"><button id="sp">⏸ Pausar</button><button id="sx">✕ Cerrar</button></div><p id="sm"></p><video id="vd" playsinline muted></video><canvas id="cv" hidden></canvas><input type="file" id="fi" accept="image/*" style="position:absolute;left:-9999px"><div class="qa"><label for="fi">🖼 Desde galería</label></div></div></div>
+</div>
+<div id="qr" class="sh"><div>
+<div class="sht"><h2>Compartir lista</h2><button class="ib" id="qc" aria-label="Cerrar"><svg class="i"><use href="#i-x"/></svg></button></div>
+<div id="qs"></div><p class="hint" id="qe">La otra persona escanea este QR con “Cargar QR”.</p>
+<button class="btn pr" id="qw"><svg class="i"><use href="#i-chat"/></svg>Enviar QR por WhatsApp</button>
+<button class="btn" id="qd"><svg class="i"><use href="#i-down"/></svg>Descargar imagen QR</button>
+</div></div>
+<div id="sc" class="sh"><div>
+<div class="sht"><h2>Cargar QR</h2><button class="ib" id="sx" aria-label="Cerrar"><svg class="i"><use href="#i-x"/></svg></button></div>
+<div class="vw" id="vw"><video id="vd" playsinline muted></video><div id="off"><svg class="i" style="width:28px;height:28px"><use href="#i-camoff"/></svg></div></div>
+<canvas id="cv" hidden></canvas><input type="file" id="fi" accept="image/*" style="position:absolute;left:-9999px">
+<p class="hint" id="sm"></p>
+<button class="btn" id="ct"></button>
+<label class="btn" for="fi"><svg class="i"><use href="#i-img"/></svg>Elegir imagen de la galería</label>
+</div></div>
 <div id="ts"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 <script>
-var L,db,kind='p';
+var L,db,kind='p',qBlob=null,stream=null,raf=0,cam=false,bd=null;
+try{if('BarcodeDetector' in window)bd=new BarcodeDetector({formats:['qr_code']})}catch(e){}
 var $=function(s){return document.querySelector(s)};
 var uid=function(){return Math.random().toString(36).slice(2,7)};
 var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+var fmt=function(n){return String(+n.toFixed(2))};
+function ic(n){return '<svg class="i"><use href="#i-'+n+'"/></svg>'}
+function show(id,v){$(id).style.display=v?'flex':'none'}
+function toast(m){var t=$('#ts');t.textContent=m;t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(function(){t.style.display='none'},2800)}
 function openDB(){return new Promise(function(r){try{var q=indexedDB.open('listas',1);q.onupgradeneeded=function(){q.result.createObjectStore('l',{keyPath:'id'})};q.onsuccess=function(){db=q.result;r()};q.onerror=function(){r()}}catch(e){r()}})}
 function put(l){try{db&&db.transaction('l','readwrite').objectStore('l').put(l)}catch(e){}}
 function all(){return new Promise(function(r){try{var q=db.transaction('l').objectStore('l').getAll();q.onsuccess=function(){r(q.result||[])};q.onerror=function(){r([])}}catch(e){r([])}})}
@@ -67,6 +125,22 @@ function clean(s){return String(s).replace(/[|~]/g,' ')}
 function enc(l){var s=[l.id,l.v,clean(l.t)].join('|')+'~'+l.i.map(function(x){return[clean(x.n),x.q,x.p,x.d?1:0,x.k].join('|')}).join('~');return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
 function dec(s){try{s=s.replace(/-/g,'+').replace(/_/g,'/');var t=decodeURIComponent(escape(atob(s))).split('~'),h=t.shift().split('|');return{id:h[0],v:+h[1]||0,t:h.slice(2).join('|'),i:t.filter(Boolean).map(function(z){var a=z.split('|');return{n:a[0],q:+a[1]||0,p:+a[2]||0,d:a[3]=='1',k:a[4]=='t'?'t':'p'}})}}catch(e){return null}}
 function fresh(){return{id:uid(),v:0,t:'Mi lista',i:[]}}
+function sync(){try{history.replaceState(null,'','#L='+enc(L))}catch(e){}}
+function change(){L.v++;L.u=Date.now();put(L);sync()}
+function total(){return L.i.reduce(function(a,x){return a+(x.k=='p'?x.q*x.p:0)},0)}
+function sub(x){return x.p>0?'Bs '+fmt(x.q*x.p):''}
+function info(){var s=total(),n=L.i.length;$('#sub').textContent=n+(n==1?' ítem':' ítems')+(s>0?' · Total Bs '+fmt(s):'')}
+function row(x,i){
+  var p=x.k=='p';
+  return '<div class="r'+(x.d?' d':'')+'"><div class="l1"><button class="ck'+(x.d?' on':'')+'" data-a="d" data-i="'+i+'" aria-label="Marcar como listo">'+ic('check')+'</button><input class="n" data-a="n" data-i="'+i+'" value="'+esc(x.n)+'" enterkeyhint="done"><button class="tb" data-a="k" data-i="'+i+'" title="'+(p?'Cambiar a tarea':'Cambiar a producto')+'">'+ic(p?'bag':'task')+'</button><button class="tb" data-a="x" data-i="'+i+'" title="Eliminar">'+ic('trash')+'</button></div>'
+  +(p?'<div class="l2"><label class="f">Cant.<input type="number" inputmode="decimal" min="0" data-a="q" data-i="'+i+'" value="'+x.q+'"></label><label class="f">Precio Bs<input type="number" inputmode="decimal" min="0" step="any" data-a="p" data-i="'+i+'" value="'+x.p+'"></label><span class="st" id="st'+i+'">'+sub(x)+'</span></div>':'')+'</div>';
+}
+function render(){
+  $('#tit').value=L.t;
+  $('#list').innerHTML=L.i.length?L.i.map(row).join(''):'<div class="e">'+ic('bag')+'<b>Tu lista está vacía</b><span>Escribe abajo y toca +. Puedes separar varios con comas.</span></div>';
+  info();
+}
+function fillSel(){all().then(function(a){a.sort(function(x,y){return(y.u||0)-(x.u||0)});$('#sel').innerHTML=a.map(function(x){return'<option value="'+x.id+'"'+(x.id==L.id?' selected':'')+'>'+esc(x.t)+'</option>'}).join('')})}
 async function boot(){
   var saved=await all(),h=location.hash,inc=h.indexOf('#L=')==0?dec(h.slice(3)):null;
   if(inc){var ex=saved.filter(function(x){return x.id==inc.id})[0];
@@ -75,50 +149,32 @@ async function boot(){
   else{L=fresh();L.u=Date.now();put(L)}
   sync();render();fillSel();
 }
-function sync(){history.replaceState(null,'','#L='+enc(L));share()}
-function change(){L.v++;L.u=Date.now();put(L);sync()}
-function total(){return L.i.reduce(function(a,x){return a+(x.k=='p'?x.q*x.p:0)},0)}
-function share(){
-  var t='*'+L.t+'*\n'+L.i.map(function(x){return(x.d?'✔ ':'▫️ ')+(x.k=='p'?x.q+'× '+x.n+(x.p>0?' · Bs '+x.p:''):x.n)}).join('\n');
-  var s=total();if(s>0)t+='\n\n*Total: Bs '+(+s.toFixed(2))+'*';
-  t+='\n\nAbrir y editar:\n'+location.href;
-  $('#wa').href='https://wa.me/?text='+encodeURIComponent(t);
-  $('#tot').textContent=s>0?'Total Bs '+(+s.toFixed(2)):L.i.length+' ítems';
-}
-function render(){
-  $('#tit').value=L.t;
-  $('#list').innerHTML=L.i.length?L.i.map(function(x,i){
-    return '<div class="r'+(x.d?' d':'')+'"><input type="checkbox" data-a="d" data-i="'+i+'"'+(x.d?' checked':'')+'><span class="k" data-a="k" data-i="'+i+'">'+(x.k=='p'?'🛒':'✅')+'</span><input class="n" data-a="n" data-i="'+i+'" value="'+esc(x.n)+'">'
-    +(x.k=='p'?'<input class="q" type="number" inputmode="decimal" min="0" data-a="q" data-i="'+i+'" value="'+x.q+'"><input class="p" type="number" inputmode="decimal" min="0" step="any" data-a="p" data-i="'+i+'" value="'+x.p+'">':'')
-    +'<button class="x" data-a="x" data-i="'+i+'">✕</button></div>'}).join(''):'<div class="e">Vacía. Escribe arriba y toca Enter.</div>';
-  share();
-}
-function fillSel(){all().then(function(a){a.sort(function(x,y){return(y.u||0)-(x.u||0)});$('#sel').innerHTML=a.map(function(x){return'<option value="'+x.id+'"'+(x.id==L.id?' selected':'')+'>'+esc(x.t)+'</option>'}).join('')})}
 function add(){
   var v=$('#txt').value.split(/[,\n]+/).map(function(s){return s.trim()}).filter(Boolean);
   if(!v.length)return;
   v.forEach(function(n){L.i.push({n:n,q:1,p:0,d:false,k:kind})});
-  $('#txt').value='';change();render();$('#txt').focus();fillSel();
+  $('#txt').value='';change();render();fillSel();var l=$('#list');l.scrollTop=l.scrollHeight;$('#txt').focus();
 }
 $('#add').onclick=add;
 $('#txt').onkeydown=function(e){if(e.key=='Enter'){e.preventDefault();add()}};
-$('#kd').onclick=function(){kind=kind=='p'?'t':'p';this.textContent=kind=='p'?'🛒':'✅'};
+function setKind(k){kind=k;$('#kp').classList.toggle('on',k=='p');$('#kt').classList.toggle('on',k=='t');$('#txt').focus()}
+$('#kp').onclick=function(){setKind('p')};$('#kt').onclick=function(){setKind('t')};
 $('#tit').oninput=function(){L.t=this.value;change()};
 $('#tit').onchange=fillSel;
 $('#list').addEventListener('input',function(e){
-  var t=e.target,a=t.dataset.a,x=L.i[t.dataset.i];if(!x)return;
-  if(a=='n')x.n=t.value;else if(a=='q')x.q=Number(t.value)||0;else if(a=='p')x.p=Number(t.value)||0;
-  else if(a=='d'){x.d=t.checked;change();render();return}
-  change();
+  var t=e.target,a=t.dataset.a,i=t.dataset.i,x=L.i[i];if(!x)return;
+  if(a=='n')x.n=t.value;else if(a=='q')x.q=Number(t.value)||0;else if(a=='p')x.p=Number(t.value)||0;else return;
+  change();var s=document.getElementById('st'+i);if(s)s.textContent=sub(x);info();
 });
+$('#list').addEventListener('focusin',function(e){if(e.target.type=='number')e.target.select()});
 $('#list').addEventListener('click',function(e){
-  var t=e.target,a=t.dataset.a,i=t.dataset.i;if(!a||i==null)return;
-  if(a=='k'){L.i[i].k=L.i[i].k=='p'?'t':'p';change();render()}
-  else if(a=='x'){L.i.splice(i,1);change();render()}
+  var b=e.target.closest('button[data-a]');if(!b)return;var i=b.dataset.i,a=b.dataset.a,x=L.i[i];
+  if(a=='d')x.d=!x.d;else if(a=='k')x.k=x.k=='p'?'t':'p';else if(a=='x')L.i.splice(i,1);else return;
+  change();render();
 });
-$('#new').onclick=function(){L=fresh();L.u=Date.now();put(L);sync();render();fillSel();$('#tit').select()};
+$('#new').onclick=function(){L=fresh();L.u=Date.now();put(L);sync();render();fillSel();$('#tit').focus();$('#tit').select()};
 $('#sel').onchange=function(){var id=this.value;all().then(function(a){var f=a.filter(function(x){return x.id==id})[0];if(f){L=f;L.u=Date.now();put(L);sync();render()}})};
-var qBlob=null,stream=null,raf=0;
+/* ---- QR: compartir ---- */
 function base(){return location.href.split('#')[0]}
 function qrPng(cb){
   var q=qrcode(0,'L');q.addData(location.href);q.make();
@@ -128,26 +184,35 @@ function qrPng(cb){
   cv.toBlob(cb,'image/png');
 }
 $('#qb').onclick=function(){
-  qBlob=null;$('#qs').textContent='';$('#qr').style.display='flex';
-  try{qrPng(function(b){qBlob=b;$('#qs').innerHTML='<img alt="QR" src="'+URL.createObjectURL(b)+'">'})}
-  catch(e){$('#qs').textContent='La lista es muy grande para un QR. Usa el botón de WhatsApp.'}
+  qBlob=null;$('#qs').innerHTML='';$('#qe').textContent='La otra persona escanea este QR con “Cargar QR”.';show('#qr',1);
+  try{qrPng(function(b){qBlob=b;$('#qs').innerHTML='<img alt="Código QR de la lista" src="'+URL.createObjectURL(b)+'">'})}
+  catch(e){$('#qe').textContent='La lista es muy grande para un QR. Quita algunos ítems.'}
 };
-$('#qc').onclick=function(){$('#qr').style.display='none'};
-$('#qr').onclick=function(e){if(e.target==this)this.style.display='none'};
+$('#qc').onclick=function(){show('#qr',0)};
+$('#qr').onclick=function(e){if(e.target==this)show('#qr',0)};
 $('#qd').onclick=function(){
   if(!qBlob)return;var a=document.createElement('a');a.href=URL.createObjectURL(qBlob);
   a.download=(L.t||'lista').replace(/[^\w-]+/g,'_')+'-QR.png';document.body.appendChild(a);a.click();a.remove();
 };
 $('#qw').onclick=function(){
   if(!qBlob)return;
-  var txt='*'+L.t+'*\nEscanea el QR, o abre la web y toca "Leer QR":\n'+base();
+  var txt='*'+L.t+'*\nEscanea el QR, o abre la web y toca "Cargar QR":\n'+base();
   var f=new File([qBlob],'lista-QR.png',{type:'image/png'});
   if(navigator.canShare&&navigator.canShare({files:[f]}))navigator.share({files:[f],text:txt}).catch(function(){});
-  else window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
+  else window.open('https://wa.me/?text='+encodeURIComponent(txt+'\n\nLista directa:\n'+location.href),'_blank');
 };
-var bd=null,paused=false;try{if('BarcodeDetector' in window)bd=new BarcodeDetector({formats:['qr_code']})}catch(e){}
-function toast(m){var t=$('#ts');t.textContent=m;t.style.display='block';setTimeout(function(){t.style.display='none'},2800)}
-function stopScan(){cancelAnimationFrame(raf);paused=false;if(stream){stream.getTracks().forEach(function(t){t.stop()});stream=null}$('#vd').srcObject=null;$('#sc').style.display='none'}
+/* ---- QR: cargar ---- */
+function stopCam(){cam=false;cancelAnimationFrame(raf);if(stream){stream.getTracks().forEach(function(t){t.stop()});stream=null}$('#vd').srcObject=null}
+function noCam(m){stopCam();$('#vw').classList.add('off');$('#ct').innerHTML=ic('cam')+'Encender cámara';$('#sm').textContent=m||'Cámara apagada. Puedes cargar el QR desde una imagen.'}
+function startCam(){
+  cam=true;$('#vw').classList.remove('off');$('#ct').innerHTML=ic('camoff')+'Apagar cámara';$('#sm').textContent='Apunta al código QR';
+  if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){noCam('Este navegador no permite usar la cámara.');return}
+  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280}},audio:false}).then(function(s){
+    if(!cam){s.getTracks().forEach(function(t){t.stop()});return}
+    stream=s;var v=$('#vd');v.srcObject=s;v.play().catch(function(){});tick();
+  }).catch(function(){noCam('No se pudo abrir la cámara. Usa una imagen de la galería.')});
+}
+function closeScan(){stopCam();show('#sc',0)}
 function jsq(c){try{var d=c.getContext('2d').getImageData(0,0,c.width,c.height),r=jsQR(d.data,d.width,d.height);return r?r.data:null}catch(e){return null}}
 function readCanvas(c,src){
   var p=bd?bd.detect(src).then(function(a){return a.length?a[0].rawValue:null}).catch(function(){return null}):Promise.resolve(null);
@@ -156,36 +221,27 @@ function readCanvas(c,src){
 function got(txt){
   var i=txt?txt.indexOf('#L='):-1,l=i>=0?dec(txt.slice(i+3)):null;
   if(!l){$('#sm').textContent='Ese QR no es de una lista.';return false}
-  stopScan();
+  closeScan();
   all().then(function(a){var ex=a.filter(function(x){return x.id==l.id})[0];
-    L=l;L.v=Math.max(l.v,ex?ex.v:0);L.u=Date.now();put(L);sync();render();fillSel();
-    toast('✔ Lista cargada: '+L.t+' ('+L.i.length+' ítems)')});
+    L=l;L.v=Math.max(l.v,ex?ex.v:0);L.u=Date.now();put(L);sync();render();fillSel();$('#list').scrollTop=0;
+    toast('Lista cargada: '+L.t+' ('+L.i.length+' ítems)')});
   return true;
 }
 function tick(){
-  if(!stream||paused)return;var v=$('#vd');
+  if(!stream)return;var v=$('#vd');
   if(v.readyState>=2&&v.videoWidth){
     var c=$('#cv'),w=Math.min(v.videoWidth,1280),k=w/v.videoWidth;c.width=w;c.height=Math.round(v.videoHeight*k);
     c.getContext('2d').drawImage(v,0,0,c.width,c.height);
-    readCanvas(c,v).then(function(t){if(!stream||paused)return;if(t&&got(t))return;raf=requestAnimationFrame(tick)});
+    readCanvas(c,v).then(function(t){if(!stream)return;if(t&&got(t))return;raf=requestAnimationFrame(tick)});
     return;
   }
   raf=requestAnimationFrame(tick);
 }
-$('#ld').onclick=function(){
-  $('#sm').textContent='Apunta al QR…';$('#sp').textContent='⏸ Pausar';paused=false;$('#sc').style.display='flex';
-  if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){$('#sm').textContent='Sin cámara. Usa "Desde galería".';return}
-  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280}},audio:false}).then(function(s){
-    stream=s;var v=$('#vd');v.srcObject=s;v.play().catch(function(){});tick()
-  }).catch(function(){$('#sm').textContent='No se pudo abrir la cámara. Usa "Desde galería".'});
-};
-$('#sp').onclick=function(){
-  if(!stream)return;var v=$('#vd');paused=!paused;
-  if(paused){cancelAnimationFrame(raf);v.pause();this.textContent='▶ Reanudar';$('#sm').textContent='Cámara en pausa'}
-  else{v.play();this.textContent='⏸ Pausar';$('#sm').textContent='Apunta al QR…';tick()}
-};
-$('#sx').onclick=stopScan;
-document.addEventListener('visibilitychange',function(){if(document.hidden&&stream)stopScan()});
+$('#ld').onclick=function(){show('#sc',1);startCam()};
+$('#sx').onclick=closeScan;
+$('#sc').onclick=function(e){if(e.target==this)closeScan()};
+$('#ct').onclick=function(){if(cam)noCam();else startCam()};
+document.addEventListener('visibilitychange',function(){if(document.hidden&&stream)noCam()});
 $('#fi').onchange=function(){
   var f=this.files&&this.files[0];if(!f)return;var inp=this;$('#sm').textContent='Leyendo imagen…';
   var im=new Image();
