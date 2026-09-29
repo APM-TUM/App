@@ -298,10 +298,10 @@ $('#qd').onclick=function(){
 };
 $('#qw').onclick=function(){
   if(!qBlob)return;
-  var txt='*'+L.t+'*\nEscanea el QR, o abre la web y toca "Cargar QR":\n'+base();
+  var txt='*'+L.t+'*\n👉 Toca este enlace para abrir el pedido:\n'+location.href+'\n\n(O escanea el QR con "Cargar QR")';
   var f=new File([qBlob],'lista-QR.png',{type:'image/png'});
   if(navigator.canShare&&navigator.canShare({files:[f]}))navigator.share({files:[f],text:txt}).catch(function(){});
-  else window.open('https://wa.me/?text='+encodeURIComponent(txt+'\n\nLista directa:\n'+location.href),'_blank');
+  else window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
 };
 /* ---- QR: cargar ---- */
 function stopCam(){cam=false;cancelAnimationFrame(raf);if(stream){stream.getTracks().forEach(function(t){t.stop()});stream=null}$('#vd').srcObject=null}
@@ -410,10 +410,10 @@ $('#tkc').onclick=function(){show('#tks',0)};
 $('#tks').onclick=function(e){if(e.target==this)show('#tks',0)};
 $('#tkd').onclick=function(){if(!tkBlob)return;var a=document.createElement('a');a.href=URL.createObjectURL(tkBlob);a.download=(L.t||'pedido').replace(/[^\w-]+/g,'_')+'-ticket.png';document.body.appendChild(a);a.click();a.remove()};
 $('#tkw').onclick=function(){
-  if(!tkBlob)return;var txt='*'+L.t+'*\nTotal: Bs '+fmt(total());
+  if(!tkBlob)return;var txt='*'+L.t+'*\nTotal: Bs '+fmt(total())+'\n👉 Abrir pedido:\n'+location.href;
   var f=new File([tkBlob],'pedido.png',{type:'image/png'});
   if(navigator.canShare&&navigator.canShare({files:[f]}))navigator.share({files:[f],text:txt}).catch(function(){});
-  else window.open('https://wa.me/?text='+encodeURIComponent(txt+'\n'+location.href),'_blank');
+  else window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
 };
 /* ---- Dictado por voz ---- */
 var SR=window.SpeechRecognition||window.webkitSpeechRecognition,rec=null,lis=false;
