@@ -154,7 +154,8 @@ var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&
 var fmt=function(n){return String(+n.toFixed(2))};
 function ic(n){return '<svg class="i"><use href="#i-'+n+'"/></svg>'}
 function show(id,v){$(id).style.display=v?'flex':'none'}
-function toast(m,undo){var t=$('#ts');$('#tm').textContent=m;$('#tu').style.display=undo?'block':'none';$('#tu').onclick=function(){t.style.display='none';if(undo)undo()};t.style.display='flex';clearTimeout(toast.h);toast.h=setTimeout(function(){t.style.display='none'},undo?5000:2800)}
+$('#tm').onclick=function(){$('#ts').style.display='none'};
+function toast(m,undo){var t=$('#ts');$('#tm').textContent=m;$('#tu').style.display=undo?'block':'none';$('#tu').onclick=function(){t.style.display='none';if(undo)undo()};t.style.display='flex';clearTimeout(toast.h);toast.h=setTimeout(function(){t.style.display='none'},undo?3500:1800)}
 function openDB(){return new Promise(function(r){try{var q=indexedDB.open('listas',2);q.onupgradeneeded=function(){var d=q.result;if(!d.objectStoreNames.contains('l'))d.createObjectStore('l',{keyPath:'id'});if(!d.objectStoreNames.contains('p'))d.createObjectStore('p',{keyPath:'k'})};q.onsuccess=function(){db=q.result;r()};q.onerror=function(){r()}}catch(e){r()}})}
 function put(l){try{db&&db.transaction('l','readwrite').objectStore('l').put(l)}catch(e){}}
 function all(){return new Promise(function(r){try{var q=db.transaction('l').objectStore('l').getAll();q.onsuccess=function(){r(q.result||[])};q.onerror=function(){r([])}}catch(e){r([])}})}
@@ -236,7 +237,7 @@ $('#list').addEventListener('click',function(e){
 $('#new').onclick=function(){L=fresh();L.u=Date.now();put(L);sync();render();fillSel();$('#tit').focus();$('#tit').select()};
 function dupList(id){all().then(function(a){var f=a.filter(function(z){return z.id==id})[0];if(!f)return;
   var n={id:uid(),v:0,t:f.t+' (copia)',i:f.i.map(function(x){return{n:x.n,q:x.q,p:x.p,d:false,k:x.k}}),u:Date.now()};
-  put(n);L=n;sync();render();show('#ls',0);toast('Copia lista para usar')})}
+  put(n);renderLists();toast('Lista duplicada')})}
 function del(id){try{db.transaction('l','readwrite').objectStore('l').delete(id)}catch(e){}}
 function totalOf(l){return l.i.reduce(function(a,x){return a+(x.k=='p'?x.q*x.p:0)},0)}
 function renderLists(){all().then(function(a){
