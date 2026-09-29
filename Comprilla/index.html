@@ -34,13 +34,15 @@ button{cursor:pointer;border:1px solid var(--b);background:var(--c);border-radiu
 #tot{flex:1;font-weight:600}
 #wa{background:var(--a);color:#fff;text-decoration:none;font-weight:700;border-radius:10px;padding:11px 16px}
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:9}
-.ov>div{background:#fff;padding:16px;border-radius:14px;width:min(88vw,360px);text-align:center;color:#111}
-.ov img{width:100%;height:auto;display:block}
+.ov>div{background:#fff;padding:14px;border-radius:14px;width:min(94vw,520px);max-height:94vh;overflow:auto;text-align:center;color:#111}
+.ov img{width:100%;height:auto;display:block;image-rendering:pixelated}
+.ov label{flex:1;border:1px solid #ddd;background:#f0efe9;border-radius:10px;padding:10px 12px;cursor:pointer}
+#ts{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#111;color:#fff;padding:10px 14px;border-radius:10px;display:none;z-index:20;max-width:90vw;text-align:center}
 .ov button{color:#111;background:#f0efe9;border-color:#ddd}
 .ov .qa{display:flex;gap:8px;margin-top:10px}.ov .qa button{flex:1}
 .ov .g{background:#1f9d55;color:#fff;border-color:#1f9d55;font-weight:700}
 .ov p{margin:8px 0 0;font-size:14px;min-height:18px}
-#vd{width:100%;border-radius:10px;background:#000}
+#vd{width:100%;max-height:42vh;object-fit:cover;border-radius:10px;background:#000;margin-top:8px}
 </style></head><body><div class="w">
 <div class="top"><input id="tit" placeholder="Título"><select id="sel"></select><button id="new" title="Nueva lista">＋</button></div>
 <p class="sub">Todo se guarda solo. Comparte y la otra persona abre el mismo enlace.</p>
@@ -49,7 +51,8 @@ button{cursor:pointer;border:1px solid var(--b);background:var(--c);border-radiu
 <div class="bar"><div id="tot"></div><button id="qb">QR</button><button id="ld">Leer QR</button><a id="wa" target="_blank" rel="noopener">WhatsApp</a></div>
 </div>
 <div id="qr" class="ov"><div><div id="qs"></div><div class="qa"><button id="qd">⬇ Descargar</button><button id="qw" class="g">QR a WhatsApp</button></div><div class="qa"><button id="qc">Cerrar</button></div></div></div>
-<div id="sc" class="ov"><div><video id="vd" playsinline muted></video><canvas id="cv" hidden></canvas><input type="file" id="fi" accept="image/*" hidden><p id="sm">Apunta al QR…</p><div class="qa"><button id="sf">🖼 Desde galería</button><button id="sx">Cerrar</button></div></div></div>
+<div id="sc" class="ov"><div><div class="qa"><button id="sp">⏸ Pausar</button><button id="sx">✕ Cerrar</button></div><p id="sm"></p><video id="vd" playsinline muted></video><canvas id="cv" hidden></canvas><input type="file" id="fi" accept="image/*" style="position:absolute;left:-9999px"><div class="qa"><label for="fi">🖼 Desde galería</label></div></div></div>
+<div id="ts"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 <script>
@@ -119,7 +122,7 @@ var qBlob=null,stream=null,raf=0;
 function base(){return location.href.split('#')[0]}
 function qrPng(cb){
   var q=qrcode(0,'L');q.addData(location.href);q.make();
-  var n=q.getModuleCount(),c=Math.floor(640/(n+8)),sz=c*(n+8),cv=document.createElement('canvas');
+  var n=q.getModuleCount(),c=Math.max(8,Math.floor(800/(n+8))),sz=c*(n+8),cv=document.createElement('canvas');
   cv.width=cv.height=sz;var g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,sz,sz);g.fillStyle='#000';
   for(var r=0;r<n;r++)for(var k=0;k<n;k++)if(q.isDark(r,k))g.fillRect((k+4)*c,(r+4)*c,c,c);
   cv.toBlob(cb,'image/png');
@@ -142,32 +145,58 @@ $('#qw').onclick=function(){
   if(navigator.canShare&&navigator.canShare({files:[f]}))navigator.share({files:[f],text:txt}).catch(function(){});
   else window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
 };
-function stopScan(){cancelAnimationFrame(raf);if(stream){stream.getTracks().forEach(function(t){t.stop()});stream=null}$('#sc').style.display='none'}
+var bd=null,paused=false;try{if('BarcodeDetector' in window)bd=new BarcodeDetector({formats:['qr_code']})}catch(e){}
+function toast(m){var t=$('#ts');t.textContent=m;t.style.display='block';setTimeout(function(){t.style.display='none'},2800)}
+function stopScan(){cancelAnimationFrame(raf);paused=false;if(stream){stream.getTracks().forEach(function(t){t.stop()});stream=null}$('#vd').srcObject=null;$('#sc').style.display='none'}
+function jsq(c){try{var d=c.getContext('2d').getImageData(0,0,c.width,c.height),r=jsQR(d.data,d.width,d.height);return r?r.data:null}catch(e){return null}}
+function readCanvas(c,src){
+  var p=bd?bd.detect(src).then(function(a){return a.length?a[0].rawValue:null}).catch(function(){return null}):Promise.resolve(null);
+  return p.then(function(t){return t||jsq(c)});
+}
 function got(txt){
-  var i=txt.indexOf('#L=');
-  if(i<0||!dec(txt.slice(i+3))){$('#sm').textContent='Ese QR no es de una lista.';return false}
-  history.replaceState(null,'','#L='+txt.slice(i+3));stopScan();boot();return true;
+  var i=txt?txt.indexOf('#L='):-1,l=i>=0?dec(txt.slice(i+3)):null;
+  if(!l){$('#sm').textContent='Ese QR no es de una lista.';return false}
+  stopScan();
+  all().then(function(a){var ex=a.filter(function(x){return x.id==l.id})[0];
+    L=l;L.v=Math.max(l.v,ex?ex.v:0);L.u=Date.now();put(L);sync();render();fillSel();
+    toast('✔ Lista cargada: '+L.t+' ('+L.i.length+' ítems)')});
+  return true;
 }
 function tick(){
-  if(!stream)return;var v=$('#vd');
-  if(v.readyState==4){var c=$('#cv');c.width=v.videoWidth;c.height=v.videoHeight;var g=c.getContext('2d');g.drawImage(v,0,0);
-    var d=g.getImageData(0,0,c.width,c.height),r=jsQR(d.data,d.width,d.height);if(r&&got(r.data))return}
+  if(!stream||paused)return;var v=$('#vd');
+  if(v.readyState>=2&&v.videoWidth){
+    var c=$('#cv'),w=Math.min(v.videoWidth,1280),k=w/v.videoWidth;c.width=w;c.height=Math.round(v.videoHeight*k);
+    c.getContext('2d').drawImage(v,0,0,c.width,c.height);
+    readCanvas(c,v).then(function(t){if(!stream||paused)return;if(t&&got(t))return;raf=requestAnimationFrame(tick)});
+    return;
+  }
   raf=requestAnimationFrame(tick);
 }
 $('#ld').onclick=function(){
-  $('#sm').textContent='Apunta al QR…';$('#sc').style.display='flex';
+  $('#sm').textContent='Apunta al QR…';$('#sp').textContent='⏸ Pausar';paused=false;$('#sc').style.display='flex';
   if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){$('#sm').textContent='Sin cámara. Usa "Desde galería".';return}
-  navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}).then(function(s){stream=s;var v=$('#vd');v.srcObject=s;v.play();tick()})
-  .catch(function(){$('#sm').textContent='Sin cámara. Usa "Desde galería".'});
+  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280}},audio:false}).then(function(s){
+    stream=s;var v=$('#vd');v.srcObject=s;v.play().catch(function(){});tick()
+  }).catch(function(){$('#sm').textContent='No se pudo abrir la cámara. Usa "Desde galería".'});
+};
+$('#sp').onclick=function(){
+  if(!stream)return;var v=$('#vd');paused=!paused;
+  if(paused){cancelAnimationFrame(raf);v.pause();this.textContent='▶ Reanudar';$('#sm').textContent='Cámara en pausa'}
+  else{v.play();this.textContent='⏸ Pausar';$('#sm').textContent='Apunta al QR…';tick()}
 };
 $('#sx').onclick=stopScan;
-$('#sf').onclick=function(){$('#fi').click()};
+document.addEventListener('visibilitychange',function(){if(document.hidden&&stream)stopScan()});
 $('#fi').onchange=function(){
-  var f=this.files[0];if(!f)return;var im=new Image();
-  im.onload=function(){var c=$('#cv');c.width=im.naturalWidth;c.height=im.naturalHeight;var g=c.getContext('2d');g.drawImage(im,0,0);
-    var d=g.getImageData(0,0,c.width,c.height),r=jsQR(d.data,d.width,d.height);
-    if(r)got(r.data);else $('#sm').textContent='No encontré un QR en esa imagen.'};
-  im.src=URL.createObjectURL(f);this.value='';
+  var f=this.files&&this.files[0];if(!f)return;var inp=this;$('#sm').textContent='Leyendo imagen…';
+  var im=new Image();
+  im.onload=function(){
+    var c=$('#cv'),k=Math.min(1,1600/Math.max(im.naturalWidth,im.naturalHeight));
+    c.width=Math.round(im.naturalWidth*k);c.height=Math.round(im.naturalHeight*k);
+    c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+    readCanvas(c,c).then(function(t){if(t)got(t);else $('#sm').textContent='No encontré un QR en esa imagen.'});
+  };
+  im.onerror=function(){$('#sm').textContent='No pude abrir esa imagen.'};
+  im.src=URL.createObjectURL(f);inp.value='';
 };
 window.addEventListener('hashchange',function(){if(L&&location.hash.slice(3)!==enc(L))boot()});
 openDB().then(boot);
